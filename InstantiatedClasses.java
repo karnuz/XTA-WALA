@@ -40,7 +40,7 @@ class InstantiatedClasses {
             // invoke WALA to build a class hierarchy
             ClassHierarchy cha = ClassHierarchyFactory.make(scope);
 
-            PrintWriter writerfr = new PrintWriter("InstantiatedClasses", "UTF-8");
+            PrintWriter writerfr = new PrintWriter("InstantiatedClasses.facts", "UTF-8");
       
             AnalysisOptions options = new AnalysisOptions();
             IAnalysisCacheView cache = new AnalysisCacheImpl(options.getSSAOptions());

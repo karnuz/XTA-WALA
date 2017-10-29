@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.io.PrintWriter;
 import java.util.Iterator;
+import java.lang.String;
 
 
 import com.ibm.wala.classLoader.IClass;
@@ -40,7 +41,7 @@ class MethodCalls {
             // invoke WALA to build a class hierarchy
             ClassHierarchy cha = ClassHierarchyFactory.make(scope);
 
-            PrintWriter writerfr = new PrintWriter("MethodCalls", "UTF-8");
+            PrintWriter writerfr = new PrintWriter("MethodCall.facts", "UTF-8");
 
             AnalysisOptions options = new AnalysisOptions();
             IAnalysisCacheView cache = new AnalysisCacheImpl(options.getSSAOptions());
@@ -55,13 +56,21 @@ class MethodCalls {
                             SSAInstruction currentinstruction = iriterator.next();
                             if(currentinstruction instanceof SSAAbstractInvokeInstruction){
                                 SSAAbstractInvokeInstruction currentinstructiondowncasted = (SSAAbstractInvokeInstruction) currentinstruction;
-                                writerfr.println(m.getSignature() + "       "  + currentinstructiondowncasted.getDeclaredTarget().getSignature().toString() );
+                                //writerfr.println(m.getSignature() + "       "  + currentinstructiondowncasted.getDeclaredTarget().getSignature().toString() );
+                                writerfr.println(m.getSignature() + "       "  + currentinstructiondowncasted.getDeclaredTarget().getSignature().toString().substring(0,currentinstructiondowncasted.getDeclaredTarget().getSignature().toString().lastIndexOf('.')) + "	" + currentinstructiondowncasted.getDeclaredTarget().getSignature().toString().substring(currentinstructiondowncasted.getDeclaredTarget().getSignature().toString().lastIndexOf('.') + 1) );
+                                
                             }
                         }
                     }
                 }
             }
             writerfr.close();
+
+
+
+
+
+
 
         } catch (WalaException e) {
         e.printStackTrace();

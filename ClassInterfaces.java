@@ -44,7 +44,7 @@ class ClassInterfaces {
       		// invoke WALA to build a class hierarchy
       		ClassHierarchy cha = ClassHierarchyFactory.make(scope);
       		
-      		PrintWriter writer = new PrintWriter("InterfaceList", "UTF-8");
+      		PrintWriter writer = new PrintWriter("ClassInterfaces.facts", "UTF-8");
       			
       		for(IClass c : cha){
       			Collection<IClass> interfacelist = c.getAllImplementedInterfaces();
