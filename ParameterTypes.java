@@ -16,16 +16,9 @@ import com.ibm.wala.classLoader.IMethod;
 
 
 class ParameterTypes {
-/*	public static void pruneForAppLoader() {
-    Predicate<IClass> f = new Predicate<IClass>() {
-      @Override public boolean test(IClass c) {
-        return (c.getClassLoader().getReference().equals(ClassLoaderReference.Application));
-      }
-    };
 
-  }*/
 
-  public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException {
     try{
       String classpath = args[1];
       AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(classpath, (new FileProvider()).getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
@@ -41,7 +34,7 @@ class ParameterTypes {
                 int z = m.getNumberOfParameters();
                 if(z!=1){
                     for(int i=1; i<=z-1; i++){
-                        writer.println(c.getName().toString()+"   "+m.getSignature().toString() + "    " + m.getParameterType(i).toString() );  
+                        writer.println(m.getSignature().toString() + "    " + m.getParameterType(i).toString() );  
                     }
 
                 }
@@ -50,9 +43,8 @@ class ParameterTypes {
         }
         writer.close();    
       
+      } catch (WalaException e) {
       
-    } catch (WalaException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
