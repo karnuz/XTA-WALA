@@ -54,6 +54,9 @@ class ReadField {
         for(IClass c : cha){
             Collection<IMethod> methods = c.getAllMethods();
             for(IMethod m : methods){
+                String methodsig = m.getSignature();
+                String methodklass = "L" + methodsig.substring(0,methodsig.lastIndexOf('.') ).replaceAll("\\.","/");
+                String methodselector = methodsig.substring(methodsig.lastIndexOf('.')+1);
                 if(cache.getIR(m, Everywhere.EVERYWHERE) != null){
                     IR ir = cache.getIR(m , Everywhere.EVERYWHERE);
                     Iterator<SSAInstruction> iriterator = ir.iterateAllInstructions();
@@ -61,7 +64,19 @@ class ReadField {
                     SSAInstruction currentinstruction = iriterator.next();
                         if(currentinstruction instanceof SSAGetInstruction){
                             SSAGetInstruction currentinstructiondowncasted = (SSAGetInstruction) currentinstruction;
-                            writerfr.println(m.getSignature() + " " + currentinstructiondowncasted.getDeclaredField().getSignature());
+                            String fieldinst = currentinstructiondowncasted.toString();
+                            String fieldsig = currentinstructiondowncasted.getDeclaredField().getSignature().toString();
+                            String fieldklass = fieldsig.substring(0,fieldsig.indexOf('.'));
+                    		String fieldname = fieldsig.substring(fieldsig.indexOf('.')+1,fieldsig.indexOf(' '));
+                            String fieldtype = fieldsig.substring(fieldsig.lastIndexOf(' ')+1);
+                            if(fieldtype.substring(0,1).equals("[")){
+                                writerfr.println(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + "Ljava/util/Arrays");
+                                writerfr.println(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + fieldtype.substring(fieldtype.lastIndexOf('[')+1));
+                            }
+                            else {
+                                writerfr.println(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + fieldtype);
+                            }
+                            
                         }
                     }
                 }

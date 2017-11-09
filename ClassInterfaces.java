@@ -38,7 +38,7 @@ class ClassInterfaces {
 
 	public static void main(String[] args) throws IOException {
     	try{
-    		    		String classpath = args[1];
+    		String classpath = args[1];
       		AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(classpath, (new FileProvider()).getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
 
       		// invoke WALA to build a class hierarchy
@@ -47,9 +47,14 @@ class ClassInterfaces {
       		PrintWriter writer = new PrintWriter("ClassInterfaces.facts", "UTF-8");
       			
       		for(IClass c : cha){
+      			String classname = c.getName().toString();
       			Collection<IClass> interfacelist = c.getAllImplementedInterfaces();
       			for(IClass i : interfacelist){
-      				writer.println(c.getName().toString() + "	" + i.getName().toString());
+      				String intfname = i.getName().toString();
+      				//if(!intfname.substring(0,1).equals("L")){
+      					writer.println(classname + "	" + intfname );	
+      				//}
+      				
       			}
       		}
 

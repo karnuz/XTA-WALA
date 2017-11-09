@@ -26,15 +26,27 @@ class ParameterTypes {
 
       // invoke WALA to build a class hierarchy
       ClassHierarchy cha = ClassHierarchyFactory.make(scope);
-      PrintWriter writer = new PrintWriter("ParameterTypes.facts", "UTF-8");
+      PrintWriter writer = new PrintWriter("ParamTypes.facts", "UTF-8");
       
         for(IClass c : cha){
             Collection<IMethod> methods = c.getAllMethods();
             for(IMethod m : methods){
+                String methodsig = m.getSignature();
+                String methodklass = "L"+methodsig.substring(0,methodsig.lastIndexOf('.') ).replaceAll("\\.","/");
+                String methodselector = methodsig.substring(methodsig.lastIndexOf('.')+1);
                 int z = m.getNumberOfParameters();
                 if(z!=1){
                     for(int i=1; i<=z-1; i++){
-                        writer.println(m.getSignature().toString() + "    " + m.getParameterType(i).toString() );  
+                        //repetition of same type of parameters. can be removed by using set data structure.
+                        String parameterType = m.getParameterType(i).getName().toString();
+                        if(parameterType.substring(0,1).equals("[")){
+                            writer.println(methodklass + "	" + methodselector + "	" + "Ljava/util/Arrays" );
+                            writer.println(methodklass + "	" + methodselector + "	" + parameterType.substring(parameterType.lastIndexOf('[')+1) );  
+                        }
+                        else{
+                            writer.println(methodklass + "	" + methodselector + "	" + parameterType);    
+                        }
+                        
                     }
 
                 }

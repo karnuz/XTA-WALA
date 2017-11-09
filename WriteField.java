@@ -41,13 +41,16 @@ class WriteField {
             ClassHierarchy cha = ClassHierarchyFactory.make(scope);
 
       
-            PrintWriter writerfr = new PrintWriter("WriteField.facts", "UTF-8");
+            PrintWriter writer = new PrintWriter("WriteField.facts", "UTF-8");
             AnalysisOptions options = new AnalysisOptions();
             IAnalysisCacheView cache = new AnalysisCacheImpl(options.getSSAOptions());
       
             for(IClass c : cha){
                 Collection<IMethod> methods = c.getAllMethods();
                 for(IMethod m : methods){
+                    String methodsig = m.getSignature();
+                    String methodklass = "L" + methodsig.substring(0,methodsig.lastIndexOf('.') ).replaceAll("\\.","/");
+                    String methodselector = methodsig.substring(methodsig.lastIndexOf('.')+1);
                     if(cache.getIR(m, Everywhere.EVERYWHERE) != null){
                         IR ir = cache.getIR(m , Everywhere.EVERYWHERE);
                         Iterator<SSAInstruction> iriterator = ir.iterateAllInstructions();
@@ -55,13 +58,23 @@ class WriteField {
                             SSAInstruction currentinstruction = iriterator.next();
                             if(currentinstruction instanceof SSAPutInstruction){
                                 SSAPutInstruction currentinstructiondowncasted = (SSAPutInstruction) currentinstruction;
-                                writerfr.println(m.getSignature() + " " + currentinstructiondowncasted.getDeclaredField().getSignature());
+                                String fieldsig = currentinstructiondowncasted.getDeclaredField().getSignature().toString();
+                                String fieldklass = fieldsig.substring(0,fieldsig.indexOf('.'));
+                                String fieldname = fieldsig.substring(fieldsig.indexOf('.')+1,fieldsig.indexOf(' '));
+                                String fieldtype = fieldsig.substring(fieldsig.lastIndexOf(' ')+1);
+                                if(fieldtype.substring(0,1).equals("[")){
+                                    writer.println(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + "Ljava/util/Arrays");
+                                    writer.println(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + fieldtype.substring(fieldtype.lastIndexOf('[')+1));
+                                }
+                                else {
+                                    writer.println(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + fieldtype);
+                                }
                             }
                         }
                     }
                 }
             }
-            writerfr.close();
+            writer.close();
 
       
         } catch (WalaException e) {

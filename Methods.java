@@ -16,31 +16,37 @@ import com.ibm.wala.classLoader.IMethod;
 
 
 class Methods {
-    public static void main(String[] args) throws IOException {
-        try{
-            String classpath = args[1];
-            AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(classpath, (new FileProvider()).getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
+	public static void main(String[] args) throws IOException {
+		try{
+			String classpath = args[1];
+			AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(classpath, (new FileProvider()).getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
 
-            // invoke WALA to build a class hierarchy
-            ClassHierarchy cha = ClassHierarchyFactory.make(scope);
-      
-            PrintWriter writer = new PrintWriter("Methods.facts", "UTF-8");
-      
-            for(IClass c : cha){
-                Collection<IMethod> methods = c.getAllMethods();
-                for(IMethod m : methods){
-                    String w = m.getSignature().toString();
-                    //writer.println(c.getName().toString()+"   "+ w );
-                    writer.println(c.getName().toString()+"   "+ w.substring(0,w.lastIndexOf('.') )  + "    " + w.substring(w.lastIndexOf('.') + 1 ) );
-                }
-            }
-            writer.close();
-    
-      
-      
-        } catch (WalaException e) {
-        e.printStackTrace();
-        }
+			// invoke WALA to build a class hierarchy
+			ClassHierarchy cha = ClassHierarchyFactory.make(scope);
+	  
+			PrintWriter writer = new PrintWriter("Methods.facts", "UTF-8");
+	  
+			for(IClass c : cha){
+				String classname = c.getName().toString();
+				Collection<IMethod> methods = c.getAllMethods();
+				for(IMethod m : methods){
+					String methodsig = m.getSignature().toString();
+					String methodklass = "L"+ methodsig.substring(0,methodsig.lastIndexOf('.') ).replaceAll("\\.","/");
+					String methodselector = methodsig.substring(methodsig.lastIndexOf('.') + 1 );
+					//writer.println(c.getName().toString()+"   "+ w );
+					//if(!classname.substring(0,5).equals("Ljava") ){
+						writer.println(classname + "	"  + methodklass + "	" + methodselector );
+					//}
+					
+				}
+			}
+			writer.close();
+	
+	  
+	  
+		} catch (WalaException e) {
+		e.printStackTrace();
+		}
 
-    }
+	}
 }

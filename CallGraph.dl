@@ -1,113 +1,55 @@
 .symbol_type Node
 
-.decl Classes(a:Node)
-.input Classes
+.decl Classes(a:Node) input
 
-.decl Methods(a:Node, b:Node)
-.input Methods
+.decl Methods(a:Node, b:Node, c:Node) input
 
-.decl MethodCalls(a:Node, b: Node, c: Node, d:Node)
-.input MethodCalls
+.decl MethodCalls(a:Node, b: Node, c: Node, d:Node) input
 
-.decl ParamTypes(a:Node, b:Node,c:Node  ) // a is method,  b is class of method, c is related class
-.input ParamTypes
+.decl ParamTypes(a:Node, b:Node,c:Node  ) input
 
-.decl ReturnType(a:Node, b:Node, c:Node)
-.input ReturnType
+.decl ReturnType(a:Node, b:Node, c:Node) input
 
-.decl Instantiated(a:Node,b:Node,c:Node)
-.input Instantiated
+.decl InstantiatedClasses(a:Node,b:Node,c:Node) input
 
-.decl ImmediateSubclass(a:Node,b:Node)
-.input ImmediateSubclass
+.decl ImmediateSubclass(a:Node,b:Node) input
 
+.decl ReadField(a:Node,b:Node,c:Node,d:Node, e:Node) input
 
-.decl ReadField(a:Node,b:Node,c:Node,d:Node)
-.input ReadField
+.decl WriteField(a:Node, b:Node,c:Node, d:Node, e:Node) input
 
-.decl WriteField(a:Node, b:Node,c:Node, d:Node)
-.input WriteField
+.decl Fields(a:Node,b:Node,c:Node, d:Node) input
 
-.decl FieldstaticType(a:Node,b:Node,c:Node)
-.input FieldstaticType
+//p,q,r denote intermediate methods
+//a,b,d denote intermediate classes
+//x,y,z denoe variables
 
+.decl Reachable(c:Node,m:Node) output
+Reachable("LCalculator", "main([Ljava/lang/String;)V").
+Reachable(k,n):- Reachable(c,m),CallerCallee(c,m,k,n).
 
+.decl CallerCallee(a:Node, b:Node, c:Node, d:Node)
+CallerCallee(c,m,k,n):-Reachable(c,m),MethodCalls(c,m,a,n),inclusiveSubType(a,b),Methods(b,k,n), RelatedMethodClasses(c,m,b).
 
-.decl Reachable(m:Node)
-{
-.decl RelatedClasses(m:Node, c:Node) // 'm' is the method name, 'c' is the reachable class name.
+.decl RelatedMethodClasses(a:Node, b:Node, c:Node)
+RelatedMethodClasses(k,n,l):-Reachable(c,m),CallerCallee(c,m,k,n),subTypesParamTypes(k,n,l),RelatedMethodClasses(c,m,l).
 
-//Reachability Criterion
-Reachable(rootmethod).
-Reachable(n) :- Reachable(m), MethodCalls(m,n), Methods(c,n), RelatedClasses(m,c) .
+RelatedMethodClasses(c,m,l):- Reachable(c,m),CallerCallee(c,m,k,n),subTypesReturnType(k,n,l),RelatedMethodClasses(k,n,l).
 
-//Related Classes due to Parameter Type
-RelatedClasses(n,c) :- Reachable(m), RelatedClasses(m,b), Methods(b,n), ParamTypes(n,k), inclusiveSubtype(k,c), RelatedClasses(m,c)
+RelatedMethodClasses(k,n,l):- Reachable(c,m),CallerCallee(c,m,k,n),MethodCalls(c,m,a,n),inclusiveSubType(a,l),RelatedMethodClasses(c,m,l),Methods(l,k,n).
 
-//RelatedClasses(n,c) :- ParamTypes(n,k), inclusiveSubtype(k,c), Reachable(m), MethodCalls(m,n),RelatedClasses(m,c), Methods(
-//b,n), RelatedClasses (m,b).
+RelatedMethodClasses(c,m,l):- Reachable(c,m),InstantiatedClasses(c,m,l).
 
-//Related Classes due to Return Type
-RelatedClasses(m,c) :- Reachable(m), RelatedClasses(m,b), Methods(b,n), MethodCalls(m,n), ReturnType(n,k), inclusiveSubtype(k,c), RelatedClasses(n,c).
+RelatedMethodClasses(c,m,l):- Reachable(c,m),ReadField(c,m,a,x,_),Fields(a,b,x,_),RelatedFieldClasses(b,x,l).
 
-RelatedClasses(n,c) :- Reachable(m), RelatedClasses(m,c), MethodCalls(m,n), Methods(c,n)
-//need to take into account what is the static type of class methond 'n' is being called upon.
-C1->C2->C3->C4->C5 is the subclass structure with method 'm' common to all of them, and C3,C4,C5 are related classes to m, and if e.n is called where static type of 'e' is C4, then only C4 and C5 should get added to RelatedClasses of n. However in above code all three -C3, C4 , C5 - will get added. However there is a possibility that this might not have any effect on ReachableMethods set. 
+.declRelatedFieldClasses(a:Node,b:Node,c:Node)
+RelatedFieldClasses(k,x,l):- Reachable(c,m),WriteField(c,m,d,x,_),Fields(d,k,x,e),inclusiveSubType(e,l),RelatedMethodClasses(c,m,l).
 
-}
-
-
-Reachable("Main","C1").
-Reachable(n,k) :- Reachable(m,b), MethodCalls(m,b,n,e), inclusiveSubtype(e,x), staticLookup(x,n,k,n), RelatedClasses(m,b,x).
-.output Reachable(IO=stdout)
-.output RelatedClasses
-.output Reachable
-
-//Parametertype
-RelatedClasses(n,h,x):- ParamTypes(n,h,k), inclusiveSubtype(k,x), MethodCalls(m,b,n,c), RelatedClasses(m,b,x), Reachable(m,b), inclusiveSubtype(c,y), staticLookup(y,n,h,n), RelatedClasses(m,b,y).
-
-//Return Type
-RelatedClasses(m,b,y):- Reachable(m,b), MethodCalls(m,b,n,c), inclusiveSubtype(c,x), staticLookup(x,n,h,n), RelatedClasses(m,b,x), ReturnType(n,h,k), inclusiveSubtype(k,y), RelatedClasses(n,h,y).
-
- //Relating a class/sub class to the method depending on the type of object the method will be called upon on basis of a priori/static type of the object.
-RelatedClasses(n,h,y):- Methods(h,n),Reachable(m,b), MethodCalls(m,b,n,c), inclusiveSubtype(c,y), staticLookup(y,n,h,n),RelatedClasses(m,b,y).
-
-//Instantiated Classes
-RelatedClasses(m,c,x):- Instantiated(m,c,x).
-
-
-//Fields
-.decl RelatedFieldClass(a:Node,b:Node,c:Node)
-.output RelatedFieldClass
-
-RelatedClasses(m,b,c):- Reachable(m,b), ReadField(m,b,g,x), RelatedFieldClass(g,x,c).
-
-RelatedFieldClass(g,x,c) :- FieldstaticType(g,x,k), Reachable(m,b), WriteField(m,b,g,x), inclusiveSubtype(k,c),RelatedClasses(m,b,c).
-
-
-
-
-//staticLookup for (c,m)
-.decl staticLookup(a:Node,b:Node,c:Node,d:Node)
-staticLookup(c,m,c,m) :- Methods (c,m).
-staticLookup(c,m,k,m):- ImmediateSubclass(k,c), Methods(k,m), !Methods(c,m).   
- // This is to deal with immediate subclass case
-staticLookup(c, m, k, m) :- Subclass(k,c),  Methods(k,m), !Methods (c,m), IntermediateClass(c,k,x), !Methods(x,m).  
-// This does not deal with the immediate subclass case because IntermediateClass evaluates to null
-.output staticLookup
-
-
-
-.decl inclusiveSubtype(a:Node,b:Node)
-inclusiveSubtype(c,x):- Subclass(c,x).
-inclusiveSubtype(c,c):- Classes(c).
-inclusiveSubtype(c,c):-Subclass(_,c).
+.decl inclusiveSubType(a:Node,b:Node)
+inclusiveSubType(c,x):- Subclass(c,x).
+inclusiveSubType(c,c):- Classes(c).
+inclusiveSubType(c,c):-Subclass(_,c).
 //.output inclusiveSubtype
-
-
-.decl IntermediateClass(a:Node,b:Node,c:Node)
-IntermediateClass(g,h,k) :- Subclass(k,g), Subclass(h,k). 
-//.output IntermediateClass
 
 
 //Subclass Calculation
@@ -115,3 +57,11 @@ IntermediateClass(g,h,k) :- Subclass(k,g), Subclass(h,k).
 Subclass(x,y) :- ImmediateSubclass(x,y).
 Subclass(x,y) :- Subclass(x,z), ImmediateSubclass(z,y).
 //.output Subclass
+
+.decl subTypesReturnType(a:Node, b:Node, c:Node)
+subTypesReturnType(k,n,l):- ReturnType(k,n,c),inclusiveSubType(c,l).
+
+.decl subTypesParamTypes(a:Node, b:Node, c:Node)
+subTypesParamTypes(k,n,l):- ParamTypes(k,n,c),inclusiveSubType(c,l).
+
+

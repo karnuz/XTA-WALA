@@ -48,7 +48,10 @@ class InstantiatedClasses {
             for(IClass c : cha){
                 Collection<IMethod> methods = c.getAllMethods();
                 for(IMethod m : methods){
-                    System.err.println(m.getSignature());
+                    String methodsig = m.getSignature();
+                    String methodklass = "L" + methodsig.substring(0,methodsig.lastIndexOf('.') ).replaceAll("\\.","/");
+                    String methodselector = methodsig.substring(methodsig.lastIndexOf('.')+1);
+                    //System.err.println(methodsig);
                     if(cache.getIR(m, Everywhere.EVERYWHERE) != null){
                         IR ir = cache.getIR(m , Everywhere.EVERYWHERE);
                         Iterator<SSAInstruction> iriterator = ir.iterateAllInstructions();
@@ -56,8 +59,16 @@ class InstantiatedClasses {
                             SSAInstruction currentinstruction = iriterator.next();
                             if(currentinstruction instanceof SSANewInstruction){
                                 SSANewInstruction currentinstructiondowncasted = (SSANewInstruction) currentinstruction;
+                                String instklass =  currentinstructiondowncasted.getConcreteType().getName().toString();
                                 //System.err.println(currentinstruction.toString());
-                                writerfr.println(m.getSignature() + " " + currentinstructiondowncasted.getConcreteType().toString());
+                                if(instklass.substring(0,1).equals("[") ){
+                                    writerfr.println( methodklass + "	" + methodselector + "	" + "Ljava/util/Arrays");
+                                    writerfr.println( methodklass + "	" + methodselector + "	" +  instklass.substring(instklass.lastIndexOf('[')+1));    
+                                }
+                                else{
+                                    writerfr.println( methodklass + "	" + methodselector + "	" + instklass);
+                                }
+                                
                             }
                         }
                     }
@@ -71,3 +82,5 @@ class InstantiatedClasses {
 
     }
 }
+
+

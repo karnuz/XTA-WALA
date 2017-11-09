@@ -28,7 +28,17 @@ class ReturnType {
             for(IClass c : cha){
                 Collection<IMethod> methods = c.getAllMethods();
                 for(IMethod m : methods){
-                    writer.println( m.getSignature().toString() + "    " + m.getReturnType() );  
+                    String methodsig = m.getSignature();
+                    String methodklass = "L" + methodsig.substring(0,methodsig.lastIndexOf('.') ).replaceAll("\\.","/");
+                    String methodselector = methodsig.substring(methodsig.lastIndexOf('.')+1);
+                    String returnType = m.getReturnType().getName().toString();
+                    if(returnType.substring(0,1).equals("[")){
+                        writer.println( methodklass + "	" + methodselector + "	" + "Ljava/util/Arrays" );
+                        writer.println( methodklass + "	" + methodselector + "	" + returnType.substring(returnType.lastIndexOf('[')+1) );
+                    }
+                    else {
+                        writer.println( methodklass + "	" + methodselector + "	" + returnType );
+                    }
                 }
             }
             writer.close();
