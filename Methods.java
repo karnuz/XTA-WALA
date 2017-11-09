@@ -17,6 +17,7 @@ import com.ibm.wala.classLoader.IMethod;
 
 class Methods {
 	public static void main(String[] args) throws IOException {
+		System.err.println("Extracting Methods...");
 		try{
 			String classpath = args[1];
 			AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(classpath, (new FileProvider()).getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));

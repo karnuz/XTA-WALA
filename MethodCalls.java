@@ -34,6 +34,7 @@ import com.ibm.wala.ssa.SSAFieldAccessInstruction;
 class MethodCalls {
 
 	public static void main(String[] args) throws IOException {
+		System.err.println("Extracting MethodCalls...");
 		try{
 			String classpath = args[1];
 			AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(classpath, (new FileProvider()).getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));

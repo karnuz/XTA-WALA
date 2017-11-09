@@ -9,7 +9,7 @@ class Extract{
 		Classes.main(args);
 		Methods.main(args);
 		MethodCalls.main(args);
-		ParameterTypes.main(args);
+		ParamTypes.main(args);
 		ReturnType.main(args);
 		InstantiatedClasses.main(args);
 		ImmediateSubClass.main(args);

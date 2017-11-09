@@ -18,6 +18,7 @@ class ImmediateSubClass {
 
 
   public static void main(String[] args) throws IOException {
+    System.err.println("Extracting SubClasses...");
     try{
       String classpath = args[1];
       AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(classpath, (new FileProvider()).getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
