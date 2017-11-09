@@ -3,7 +3,7 @@
 Extraction of Data Flow Facts
 
 
-To obtain dataflow fact install WALA and run following commands after making necessary changes in classpath
+To obtain dataflow facts install WALA and run following commands after making necessary changes in classpath
 
 ```
 java -cp ".:/home/home/WALA/com.ibm.wala.core/bin:/home/home/WALA/com.ibm.wala.util/bin:/home/home/WALA/com.ibm.wala.shrike/bin:/home/home/WALA/com.ibm.wala.core.tests/bin" Extract classpath /home/home/XTA-WALA/Calculator.jar
