@@ -37,16 +37,16 @@ import com.ibm.wala.ssa.SSAAbstractInvokeInstruction;
 
 class Extractor{
 
-	static FileWriter ClassesFile;
-	static FileWriter FieldsFile;
-	static FileWriter SubclassesFile;
-	static FileWriter InstantiatedFile;
-	static FileWriter MethodsFile;
-	static FileWriter MethodCallsFile;
-	static FileWriter ParamTypesFile;
-	static FileWriter ReturnTypesFile;
-	static FileWriter ReadFieldFile;
-	static FileWriter WriteFieldFile;
+	static FileWriter classesWriter;
+	static FileWriter fieldsWriter;
+	static FileWriter subclassesWriter;
+	static FileWriter instantiatedWriter;
+	static FileWriter methodsWriter;
+	static FileWriter methodCallsWriter;
+	static FileWriter paramTypesWriter;
+	static FileWriter returnTypesWriter;
+	static FileWriter readFieldWriter;
+	static FileWriter writeFieldWriter;
 
 	public static void main(String[] args) throws IOException {
 		try{	
@@ -54,7 +54,7 @@ class Extractor{
 			AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(classpath, (new FileProvider()).getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
 			ClassHierarchy cha = ClassHierarchyFactory.make(scope);
 			
-			openFileHandles();
+			openFileWriters();
 			gatherClasses(cha);
 			gatherFields(cha);
 			gatherSubKlasses(cha);
@@ -65,67 +65,49 @@ class Extractor{
 			getReturnTypes(cha);
 			gatherReadFieldInstances(cha);
 			gatherWriteFieldInstances(cha);
-			closeFieldHandles();
+			closeFileWriters();
 		
 		}catch (WalaException e) {
 		e.printStackTrace();
 		}
 	}
 
-	public static void openFileHandles() throws IOException{
-		if(ClassesFile == null){
-			ClassesFile = new FileWriter("Classes.facts");
-		}
-		if(FieldsFile == null){
-			FieldsFile = new FileWriter("Fields.facts");
-		}
-		if(SubclassesFile == null){
-			SubclassesFile = new FileWriter("ImmediateSubclass.facts");
-		}
-		if(InstantiatedFile == null){
-			InstantiatedFile = new FileWriter("InstantiatedClasses.facts");
-		}
-		if(MethodsFile == null){
-			MethodsFile = new FileWriter("Methods.facts");
-		}
-		if(MethodCallsFile == null){
-			MethodCallsFile = new FileWriter("MethodCalls.facts");
-		}
-		if(ParamTypesFile == null){
-			ParamTypesFile = new FileWriter("ParamTypes.facts");
-		}
-		if(ReturnTypesFile == null){
-			ReturnTypesFile = new FileWriter("ReturnType.facts");
-		}
-		if(ReadFieldFile == null){
-			ReadFieldFile = new FileWriter("ReadField.facts");
-		}
-		if(WriteFieldFile == null){
-			WriteFieldFile = new FileWriter("WriteField.facts");
-		}
+	public static void openFileWriters() throws IOException{
+		
+			classesWriter = new FileWriter("Classes.facts");
+			fieldsWriter = new FileWriter("Fields.facts");
+			subclassesWriter = new FileWriter("ImmediateSubclass.facts");
+			instantiatedWriter = new FileWriter("InstantiatedClasses.facts");
+			methodsWriter = new FileWriter("Methods.facts");
+			methodCallsWriter = new FileWriter("MethodCalls.facts");
+			paramTypesWriter = new FileWriter("ParamTypes.facts");
+			returnTypesWriter = new FileWriter("ReturnType.facts");
+			readFieldWriter = new FileWriter("ReadField.facts");
+			writeFieldWriter = new FileWriter("WriteField.facts");
+		
 	}
 
-	public static void closeFieldHandles() throws IOException{
-		ClassesFile.flush();
-		ClassesFile.close();
-		FieldsFile.flush();
-		FieldsFile.close();
-		SubclassesFile.flush();
-		SubclassesFile.close();
-		InstantiatedFile.flush();
-		InstantiatedFile.close();
-		MethodsFile.flush();
-		MethodsFile.close();
-		MethodCallsFile.flush();
-		MethodCallsFile.close();
-		ParamTypesFile.flush();
-		ParamTypesFile.close();
-		ReturnTypesFile.flush();
-		ReturnTypesFile.close();
-		ReadFieldFile.flush();
-		ReadFieldFile.close();
-		WriteFieldFile.flush();
-		WriteFieldFile.close();
+	public static void closeFileWriters() throws IOException{
+		classesWriter.flush();
+		classesWriter.close();
+		fieldsWriter.flush();
+		fieldsWriter.close();
+		subclassesWriter.flush();
+		subclassesWriter.close();
+		instantiatedWriter.flush();
+		instantiatedWriter.close();
+		methodsWriter.flush();
+		methodsWriter.close();
+		methodCallsWriter.flush();
+		methodCallsWriter.close();
+		paramTypesWriter.flush();
+		paramTypesWriter.close();
+		returnTypesWriter.flush();
+		returnTypesWriter.close();
+		readFieldWriter.flush();
+		readFieldWriter.close();
+		writeFieldWriter.flush();
+		writeFieldWriter.close();
 	}
 
 	public static void gatherClasses(ClassHierarchy cha) throws IOException {
@@ -134,7 +116,7 @@ class Extractor{
 		
 		for(IClass c:cha){
 			String classname = c.getName().toString();
-			ClassesFile.write(classname+"\n");	
+			classesWriter.write(classname+"\n");	
 		}
 		
 	}
@@ -157,11 +139,11 @@ class Extractor{
         String fieldname = fieldsig.substring(fieldsig.indexOf('.')+1,fieldsig.indexOf(' '));
         String fieldtype = fieldsig.substring(fieldsig.lastIndexOf(' ')+1);
         if(fieldtype.substring(0,1).equals("[")){
-            FieldsFile.write(classname + "	" + fieldklass + "	" + fieldname + "	" + "Ljava/util/Arrays\n");
-            FieldsFile.write(classname + "	" + fieldklass + "	" + fieldname + "	" +  fieldtype.substring(fieldtype.lastIndexOf('[')+1)+"\n");
+            fieldsWriter.write(classname + "	" + fieldklass + "	" + fieldname + "	" + "Ljava/util/Arrays\n");
+            fieldsWriter.write(classname + "	" + fieldklass + "	" + fieldname + "	" +  fieldtype.substring(fieldtype.lastIndexOf('[')+1)+"\n");
         }
         else {
-    	    FieldsFile.write(classname + "	" + fieldklass + "	" + fieldname + "	" + fieldtype + "\n" );
+    	    fieldsWriter.write(classname + "	" + fieldklass + "	" + fieldname + "	" + fieldtype + "\n" );
         }
     }
 
@@ -171,7 +153,7 @@ class Extractor{
   			String classname = c.getName().toString();
   			Collection<IClass> subklass = cha.getImmediateSubclasses(c);
 	   		for(IClass s : subklass){
-	      		SubclassesFile.write(classname + "	" + s.getName().toString()+"\n" );
+	      		subclassesWriter.write(classname + "	" + s.getName().toString()+"\n" );
   			}
 	   	}
   	}
@@ -205,11 +187,11 @@ class Extractor{
         String methodselector = methodsig.substring(methodsig.lastIndexOf('.')+1);
     	String instklass =  ((SSANewInstruction) instruction).getConcreteType().getName().toString();  	
         if(instklass.substring(0,1).equals("[") ){
-            InstantiatedFile.write( methodklass + "	" + methodselector + "	" + "Ljava/util/Arrays"+"\n");
-            InstantiatedFile.write( methodklass + "	" + methodselector + "	" +  instklass.substring(instklass.lastIndexOf('[')+1)+"\n");    
+            instantiatedWriter.write( methodklass + "	" + methodselector + "	" + "Ljava/util/Arrays"+"\n");
+            instantiatedWriter.write( methodklass + "	" + methodselector + "	" +  instklass.substring(instklass.lastIndexOf('[')+1)+"\n");    
         }
         else{
-        	InstantiatedFile.write( methodklass + "	" + methodselector + "	" + instklass+"\n");
+        	instantiatedWriter.write( methodklass + "	" + methodselector + "	" + instklass+"\n");
         }
     }
 
@@ -229,7 +211,7 @@ class Extractor{
 		String methodsig = m.getSignature().toString();
 		String methodklass = "L"+ methodsig.substring(0,methodsig.lastIndexOf('.') ).replaceAll("\\.","/");
 		String methodselector = methodsig.substring(methodsig.lastIndexOf('.') + 1 );
-		MethodsFile.write(classname + "	"  + methodklass + "	" + methodselector +"\n");
+		methodsWriter.write(classname + "	"  + methodklass + "	" + methodselector +"\n");
 		
 	}
 
@@ -261,7 +243,7 @@ class Extractor{
 		String calledmethod = ((SSAAbstractInvokeInstruction) instruction).getDeclaredTarget().getSignature();
 		String calleeklass = "L"+calledmethod.substring(0,calledmethod.lastIndexOf('.')).replaceAll("\\.","/");
 		String calleeselector = calledmethod.substring(calledmethod.lastIndexOf('.')+1);
-		MethodCallsFile.write(callerklass + "	" + callerselector + "	" + calleeklass + "	" + calleeselector+"\n");
+		methodCallsWriter.write(callerklass + "	" + callerselector + "	" + calleeklass + "	" + calleeselector+"\n");
 	}
    
     public static void getParameterTypes(ClassHierarchy cha) throws IOException {
@@ -287,11 +269,11 @@ class Extractor{
         String methodklass = "L"+methodsig.substring(0,methodsig.lastIndexOf('.') ).replaceAll("\\.","/");
         String methodselector = methodsig.substring(methodsig.lastIndexOf('.')+1);
         if(parameterType.substring(0,1).equals("[")){
-            ParamTypesFile.write(methodklass + "	" + methodselector + "	" + "Ljava/util/Arrays"+"\n" );
-            ParamTypesFile.write(methodklass + "	" + methodselector + "	" + parameterType.substring(parameterType.lastIndexOf('[')+1) +"\n");  
+            paramTypesWriter.write(methodklass + "	" + methodselector + "	" + "Ljava/util/Arrays"+"\n" );
+            paramTypesWriter.write(methodklass + "	" + methodselector + "	" + parameterType.substring(parameterType.lastIndexOf('[')+1) +"\n");  
         }
         else{
-            ParamTypesFile.write(methodklass + "	" + methodselector + "	" + parameterType+"\n");    
+            paramTypesWriter.write(methodklass + "	" + methodselector + "	" + parameterType+"\n");    
         }
     }
 
@@ -325,11 +307,11 @@ class Extractor{
 	    String fieldname = fieldsig.substring(fieldsig.indexOf('.')+1,fieldsig.indexOf(' '));
 	    String fieldtype = fieldsig.substring(fieldsig.lastIndexOf(' ')+1);
 	    if(fieldtype.substring(0,1).equals("[")){
-	        ReadFieldFile.write(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + "Ljava/util/Arrays"+"\n");
-	        ReadFieldFile.write(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + fieldtype.substring(fieldtype.lastIndexOf('[')+1)+"\n");
+	        readFieldWriter.write(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + "Ljava/util/Arrays"+"\n");
+	        readFieldWriter.write(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + fieldtype.substring(fieldtype.lastIndexOf('[')+1)+"\n");
 	    }
 	    else {
-	        ReadFieldFile.write(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + fieldtype+"\n");
+	        readFieldWriter.write(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + fieldtype+"\n");
 	    }
 	}
 
@@ -350,11 +332,11 @@ class Extractor{
         String methodklass = "L" + methodsig.substring(0,methodsig.lastIndexOf('.') ).replaceAll("\\.","/");
         String methodselector = methodsig.substring(methodsig.lastIndexOf('.')+1);
         if(returnType.substring(0,1).equals("[")){
-            ReturnTypesFile.write( methodklass + "	" + methodselector + "	" + "Ljava/util/Arrays" +"\n");
-            ReturnTypesFile.write( methodklass + "	" + methodselector + "	" + returnType.substring(returnType.lastIndexOf('[')+1)+"\n" );
+            returnTypesWriter.write( methodklass + "	" + methodselector + "	" + "Ljava/util/Arrays" +"\n");
+            returnTypesWriter.write( methodklass + "	" + methodselector + "	" + returnType.substring(returnType.lastIndexOf('[')+1)+"\n" );
         }
         else {
-            ReturnTypesFile.write( methodklass + "	" + methodselector + "	" + returnType +"\n");
+            returnTypesWriter.write( methodklass + "	" + methodselector + "	" + returnType +"\n");
         }
     }
 
@@ -389,11 +371,11 @@ class Extractor{
         String fieldname = fieldsig.substring(fieldsig.indexOf('.')+1,fieldsig.indexOf(' '));
         String fieldtype = fieldsig.substring(fieldsig.lastIndexOf(' ')+1);
         if(fieldtype.substring(0,1).equals("[")){
-            WriteFieldFile.write(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + "Ljava/util/Arrays"+"\n");
-            WriteFieldFile.write(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + fieldtype.substring(fieldtype.lastIndexOf('[')+1)+"\n");
+            writeFieldWriter.write(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + "Ljava/util/Arrays"+"\n");
+            writeFieldWriter.write(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + fieldtype.substring(fieldtype.lastIndexOf('[')+1)+"\n");
         }
         else {
-        WriteFieldFile.write(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + fieldtype+"\n");
+        writeFieldWriter.write(methodklass + "	" + methodselector + "	" + fieldklass + "	" + fieldname + "	" + fieldtype+"\n");
         }   
     }
 }
