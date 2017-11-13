@@ -92,7 +92,7 @@ class Extractor{
 			MethodCallsFile = new FileWriter("MethodCalls.facts");
 		}
 		if(ParamTypesFile == null){
-			ParamTypesFile = new FileWriter("Parameter.facts");
+			ParamTypesFile = new FileWriter("ParamTypes.facts");
 		}
 		if(ReturnTypesFile == null){
 			ReturnTypesFile = new FileWriter("ReturnType.facts");
