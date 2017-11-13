@@ -74,17 +74,16 @@ class Extractor{
 
 	public static void openFileWriters() throws IOException{
 		
-			classesWriter = new FileWriter("Classes.facts");
-			fieldsWriter = new FileWriter("Fields.facts");
-			subclassesWriter = new FileWriter("ImmediateSubclass.facts");
-			instantiatedWriter = new FileWriter("InstantiatedClasses.facts");
-			methodsWriter = new FileWriter("Methods.facts");
-			methodCallsWriter = new FileWriter("MethodCalls.facts");
-			paramTypesWriter = new FileWriter("ParamTypes.facts");
-			returnTypesWriter = new FileWriter("ReturnType.facts");
-			readFieldWriter = new FileWriter("ReadField.facts");
-			writeFieldWriter = new FileWriter("WriteField.facts");
-		
+		classesWriter = new FileWriter("Classes.facts");
+		fieldsWriter = new FileWriter("Fields.facts");
+		subclassesWriter = new FileWriter("ImmediateSubclass.facts");
+		instantiatedWriter = new FileWriter("InstantiatedClasses.facts");
+		methodsWriter = new FileWriter("Methods.facts");
+		methodCallsWriter = new FileWriter("MethodCalls.facts");
+		paramTypesWriter = new FileWriter("ParamTypes.facts");
+		returnTypesWriter = new FileWriter("ReturnType.facts");
+		readFieldWriter = new FileWriter("ReadField.facts");
+		writeFieldWriter = new FileWriter("WriteField.facts");		
 	}
 
 	public static void closeFileWriters() throws IOException{
@@ -113,17 +112,16 @@ class Extractor{
 	public static void gatherClasses(ClassHierarchy cha) throws IOException {
 		System.err.println("Extracting Class Names...");
 		
-		
 		for(IClass c:cha){
 			String classname = c.getName().toString();
 			classesWriter.write(classname+"\n");	
-		}
-		
+		}		
 	}
 
 	public static void gatherFields(ClassHierarchy cha) throws IOException {
     	System.err.println("Extracting Fields...");
-       	for(IClass c: cha){
+       	
+        for(IClass c: cha){
         	Collection<IField> fields = c.getAllFields();
 	        for(IField f : fields){
 	            printFields(f,c);
@@ -132,12 +130,12 @@ class Extractor{
     }
 
     public static void printFields(IField f, IClass c) throws IOException{
-    	
     	String classname = c.getName().toString();
     	String fieldsig = f.getReference().getSignature().toString();
         String fieldklass = fieldsig.substring(0,fieldsig.indexOf('.'));
         String fieldname = fieldsig.substring(fieldsig.indexOf('.')+1,fieldsig.indexOf(' '));
         String fieldtype = fieldsig.substring(fieldsig.lastIndexOf(' ')+1);
+        
         if(fieldtype.substring(0,1).equals("[")){
             fieldsWriter.write(classname + "	" + fieldklass + "	" + fieldname + "	" + "Ljava/util/Arrays\n");
             fieldsWriter.write(classname + "	" + fieldklass + "	" + fieldname + "	" +  fieldtype.substring(fieldtype.lastIndexOf('[')+1)+"\n");
@@ -149,11 +147,12 @@ class Extractor{
 
     public static void gatherSubKlasses(ClassHierarchy cha) throws IOException {
 	    System.err.println("Extracting SubClasses...");
-	   		for(IClass c:cha){
-  			String classname = c.getName().toString();
-  			Collection<IClass> subklass = cha.getImmediateSubclasses(c);
-	   		for(IClass s : subklass){
-	      		subclassesWriter.write(classname + "	" + s.getName().toString()+"\n" );
+	   	
+        for(IClass c:cha){
+  		    String classname = c.getName().toString();
+  		    Collection<IClass> subklass = cha.getImmediateSubclasses(c);
+	   	        for(IClass s : subklass){
+                    subclassesWriter.write(classname + "	" + s.getName().toString()+"\n" );
   			}
 	   	}
   	}
@@ -186,6 +185,7 @@ class Extractor{
         String methodklass = "L" + methodsig.substring(0,methodsig.lastIndexOf('.') ).replaceAll("\\.","/");
         String methodselector = methodsig.substring(methodsig.lastIndexOf('.')+1);
     	String instklass =  ((SSANewInstruction) instruction).getConcreteType().getName().toString();  	
+        
         if(instklass.substring(0,1).equals("[") ){
             instantiatedWriter.write( methodklass + "	" + methodselector + "	" + "Ljava/util/Arrays"+"\n");
             instantiatedWriter.write( methodklass + "	" + methodselector + "	" +  instklass.substring(instklass.lastIndexOf('[')+1)+"\n");    
@@ -197,13 +197,12 @@ class Extractor{
 
     public static void gatherMethods(ClassHierarchy cha) throws IOException {
 		System.err.println("Extracting Methods...");
-			//File file = new File("Methods.facts");
-			for(IClass c:cha){
-				Collection<IMethod> methods = c.getAllMethods();
-				for(IMethod m : methods){
-					printMethod(m,c);					
-				}
+		for(IClass c:cha){
+			Collection<IMethod> methods = c.getAllMethods();
+			for(IMethod m : methods){
+				printMethod(m,c);					
 			}
+		}
 	}
 
 	public static void printMethod(IMethod m, IClass c) throws IOException {
@@ -212,7 +211,6 @@ class Extractor{
 		String methodklass = "L"+ methodsig.substring(0,methodsig.lastIndexOf('.') ).replaceAll("\\.","/");
 		String methodselector = methodsig.substring(methodsig.lastIndexOf('.') + 1 );
 		methodsWriter.write(classname + "	"  + methodklass + "	" + methodselector +"\n");
-		
 	}
 
     public static void gatherMethodCalls(ClassHierarchy cha) throws IOException {
