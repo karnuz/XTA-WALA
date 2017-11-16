@@ -9,7 +9,11 @@ build:
 test: build
 		mkdir -p Test-Output
 		java -cp "$(WALA_CP):bin/" ExtractorDriver classpath tests/Calculator.jar
-		souffle CallGraph.dl -F temp/ -D Test-Output
+		souffle src/CallGraph.dl -F temp/ -D Test-Output
 
 analyze: build
+		mkdir -p Test-Output
 		java -cp "$(WALA_CP):bin/" ExtractorDriver classpath $(JARFILE)
+		souffle src/CallGraph.dl -F temp/ -D Test-Output
+
+.phony: build test analyze
