@@ -3,17 +3,17 @@ WALA_CP=$(WALA_ROOTDIR)/com.ibm.wala.core/bin:$(WALA_ROOTDIR)/com.ibm.wala.util/
 
 build:
 		mkdir -p bin
-		javac -cp "$(WALA_CP):bin/" src/xta/*.java -d bin/
-		javac -cp "bin/" src/ExtractorDriver.java -d bin/
+		javac -cp "$(WALA_CP):bin/" src/Extractor/*.java -d bin/
 
 test: build
 		mkdir -p Test-Output
-		java -cp "$(WALA_CP):bin/" ExtractorDriver classpath tests/Calculator.jar
+		java -cp "$(WALA_CP):bin/" Extractor.Extractor classpath tests/Calculator.jar
 		souffle src/CallGraph.dl -F temp/ -D Test-Output
+		
 
 analyze: build
 		mkdir -p Test-Output
-		java -cp "$(WALA_CP):bin/" ExtractorDriver classpath $(JARFILE)
+		java -cp "$(WALA_CP):bin/Extractor/" Extractor classpath $(JARFILE)
 		souffle src/CallGraph.dl -F temp/ -D Test-Output
 
 .phony: build test analyze

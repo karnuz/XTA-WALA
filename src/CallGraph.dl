@@ -41,6 +41,8 @@ RelatedMethodClasses(k,n,l):- Reachable(c,m),CallerCallee(c,m,k,n),MethodCalls(c
 RelatedMethodClasses(c,m,l):- Reachable(c,m),InstantiatedClasses(c,m,l).
 
 RelatedMethodClasses(c,m,l):- Reachable(c,m),ReadField(c,m,a,x,_),Fields(a,b,x,_),RelatedFieldClasses(b,x,l).
+RelatedMethodClasses(c,m,l):- Reachable(c,m),ReadField(c,m,a,x,_),InterfaceFields(a,i,b,x,l).
+//I am assuming that 'l' is also the assigned type to field 'x'
 
 .declRelatedFieldClasses(a:Node,b:Node,c:Node)
 RelatedFieldClasses(k,x,l):- Reachable(c,m),WriteField(c,m,d,x,_),Fields(d,k,x,e),inclusiveSubType(e,l),RelatedMethodClasses(c,m,l).
