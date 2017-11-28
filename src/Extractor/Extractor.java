@@ -57,11 +57,10 @@ class Extractor{
 	public static void main(String args[]) throws IOException {
 		try{    
 			String jarfile = args[1].substring(args[1].lastIndexOf('/')+1,args[1].lastIndexOf('.'))+"-DataFlowfacts";
-			System.err.println(jarfile);
 			File  f = new File(jarfile);
 			f.mkdir();
 			String classpath = args[1];
-			AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(classpath,null);
+			AnalysisScope scope = AnalysisScopeReader.makeJavaBinaryAnalysisScope(classpath,(new FileProvider()).getFile(CallGraphTestUtil.REGRESSION_EXCLUSIONS));
 			ClassHierarchy cha = ClassHierarchyFactory.make(scope);
 			
 			openFileWriters(jarfile);
